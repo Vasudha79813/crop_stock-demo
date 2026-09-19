@@ -1,0 +1,206 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Smart Crop Care Prototype</title>
+<style>
+*{box-sizing:border-box}
+body{margin:0;font-family:Arial,"Noto Sans Telugu",sans-serif;background:#f3f6f1;color:#17351f}
+.app{max-width:430px;margin:20px auto;background:white;min-height:760px;border-radius:22px;box-shadow:0 8px 30px #0002;overflow:hidden}
+header{background:#2f6f3e;color:white;padding:18px 20px}
+header h2{margin:0;font-size:21px}
+header small{opacity:.9}
+.screen{display:none;padding:20px}
+.screen.active{display:block}
+h3{margin-top:0}
+.card{background:#f4f8f2;border:1px solid #dbe7d8;border-radius:15px;padding:16px;margin:12px 0}
+.grid{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+.tile{border:0;border-radius:15px;padding:18px 10px;background:#edf5ea;font-size:15px;color:#17351f;cursor:pointer}
+.tile:hover{background:#dfeedd}
+button{border:0;border-radius:12px;padding:13px 16px;background:#2f6f3e;color:white;font-weight:bold;cursor:pointer;margin:5px 3px}
+.secondary{background:#e7efe5;color:#23492c}
+.back{background:#eee;color:#333}
+input,select{width:100%;padding:13px;border:1px solid #ccd8c9;border-radius:10px;margin:6px 0 12px;font-size:15px}
+.result{background:#eef7e9;border-left:5px solid #2f6f3e;padding:14px;border-radius:10px}
+nav{position:sticky;bottom:0;background:white;border-top:1px solid #ddd;padding:10px;display:flex;justify-content:space-around}
+nav button{background:transparent;color:#2f6f3e;margin:0;padding:8px;font-size:12px}
+.lang{float:right;background:#fff;color:#2f6f3e;padding:7px 9px}
+.lang:hover{background:#f0f5ef}
+</style>
+</head>
+<body>
+<div class="app">
+<header>
+<button class="lang" id="langBtn" onclick="toggleLang()">తెలుగు</button>
+<h2 id="appTitle">🌱 Smart Crop</h2>
+<small id="appSubtitle">Crop Care & Direct Market Access</small>
+</header>
+
+<section id="login" class="screen active">
+<h3 data-en="Welcome Farmer" data-te="స్వాగతం రైతు">Welcome Farmer</h3>
+<div class="card">
+<label data-en="Name" data-te="పేరు">Name</label>
+<input id="nameInput" placeholder="Enter your name" data-ph-en="Enter your name" data-ph-te="మీ పేరు నమోదు చేయండి">
+<label data-en="Mobile Number" data-te="మొబైల్ నంబర్">Mobile Number</label>
+<input placeholder="10-digit number" data-ph-en="10-digit number" data-ph-te="10 అంకెల నంబర్">
+<label data-en="Language" data-te="భాష">Language</label>
+<select id="loginLang" onchange="setLanguage(this.value)">
+<option value="en">English</option>
+<option value="te">తెలుగు</option>
+</select>
+<button onclick="show('home')" data-en="Continue" data-te="కొనసాగించండి">Continue</button>
+</div>
+</section>
+
+<section id="home" class="screen">
+<h3 data-en="Welcome, Farmer 👨‍🌾" data-te="స్వాగతం, రైతు 👨‍🌾">Welcome, Farmer 👨‍🌾</h3>
+<div class="grid">
+<button class="tile" onclick="show('crop')">🌿<br><span data-en="Crop Care" data-te="పంట సంరక్షణ">Crop Care</span></button>
+<button class="tile" onclick="show('market')">💰<br><span data-en="Market Prices" data-te="మార్కెట్ ధరలు">Market Prices</span></button>
+<button class="tile" onclick="show('sell')">📦<br><span data-en="Sell Produce" data-te="పంట అమ్మకం">Sell Produce</span></button>
+<button class="tile" onclick="show('buyers')">🤝<br><span data-en="Buyers / FPOs" data-te="కొనుగోలుదారులు / FPOలు">Buyers / FPOs</span></button>
+<button class="tile" onclick="show('storage')">🏪<br><span data-en="Cold Storage" data-te="కోల్డ్ స్టోరేజ్">Cold Storage</span></button>
+<button class="tile" onclick="show('logistics')">🚚<br><span data-en="Logistics" data-te="రవాణా">Logistics</span></button>
+</div>
+<div class="card">
+<span data-en="📶 Low connectivity mode" data-te="📶 తక్కువ ఇంటర్నెట్ కనెక్టివిటీ మోడ్">📶 Low connectivity mode</span><br>
+<small data-en="Basic crop-care information can be available from cached data." data-te="ప్రాథమిక పంట సంరక్షణ సమాచారం సేవ్ చేసిన డేటా ద్వారా అందుబాటులో ఉంటుంది.">Basic crop-care information can be available from cached data.</small>
+</div>
+</section>
+
+<section id="crop" class="screen">
+<h3 data-en="🌿 Crop Disease Detection" data-te="🌿 పంట వ్యాధి గుర్తింపు">🌿 Crop Disease Detection</h3>
+<label data-en="Select Crop" data-te="పంటను ఎంచుకోండి">Select Crop</label>
+<select><option>Tomato</option><option>Rice</option><option>Potato</option></select>
+<div class="card">
+<input type="file" accept="image/*">
+<button onclick="show('result')" data-en="Analyze Image" data-te="చిత్రాన్ని విశ్లేషించండి">Analyze Image</button>
+</div>
+<button class="back" onclick="show('home')" data-en="← Back" data-te="← వెనుకకు">← Back</button>
+</section>
+
+<section id="result" class="screen">
+<h3 data-en="AI Result" data-te="AI ఫలితం">AI Result</h3>
+<div class="result">
+<b data-en="Possible Disease: Tomato Early Blight" data-te="సంభావ్య వ్యాధి: టమాటా ఎర్లీ బ్లైట్">Possible Disease: Tomato Early Blight</b><br>
+<span data-en="Confidence: 92%" data-te="నమ్మక స్థాయి: 92%">Confidence: 92%</span>
+</div>
+<div class="card">
+<b data-en="Symptoms" data-te="లక్షణాలు">Symptoms</b>
+<p data-en="Brown spots may appear on leaves." data-te="ఆకులపై గోధుమ రంగు మచ్చలు కనిపించవచ్చు.">Brown spots may appear on leaves.</p>
+<b data-en="Suggested Actions" data-te="సూచించిన చర్యలు">Suggested Actions</b>
+<p data-en="Remove badly infected leaves, maintain field hygiene and follow locally recommended crop-protection practices." data-te="ఎక్కువగా ప్రభావితమైన ఆకులను తొలగించండి, పొలాన్ని శుభ్రంగా ఉంచండి మరియు స్థానికంగా సూచించిన పంట సంరక్షణ పద్ధతులను పాటించండి.">Remove badly infected leaves, maintain field hygiene and follow locally recommended crop-protection practices.</p>
+<b data-en="Prevention" data-te="నివారణ">Prevention</b>
+<p data-en="Avoid unnecessary leaf wetness and maintain proper spacing." data-te="ఆకులు అవసరం లేకుండా తడిగా ఉండకుండా చూడండి మరియు సరైన మొక్కల మధ్య దూరం పాటించండి.">Avoid unnecessary leaf wetness and maintain proper spacing.</p>
+</div>
+<button onclick="show('home')" data-en="Back to Home" data-te="హోమ్‌కు తిరిగి వెళ్లండి">Back to Home</button>
+</section>
+
+<section id="market" class="screen">
+<h3 data-en="💰 Market Prices" data-te="💰 మార్కెట్ ధరలు">💰 Market Prices</h3>
+<select><option>Tomato</option><option>Rice</option><option>Potato</option></select>
+<div class="card"><b data-en="Guntur" data-te="గుంటూరు">Guntur</b><br>₹31 / kg</div>
+<div class="card"><b data-en="Ongole" data-te="ఒంగోలు">Ongole</b><br>₹28 / kg</div>
+<div class="card"><b data-en="Vijayawada" data-te="విజయవాడ">Vijayawada</b><br>₹29 / kg</div>
+<button class="back" onclick="show('home')" data-en="← Back" data-te="← వెనుకకు">← Back</button>
+</section>
+
+<section id="sell" class="screen">
+<h3 data-en="📦 Sell Your Produce" data-te="📦 మీ పంటను అమ్మండి">📦 Sell Your Produce</h3>
+<label data-en="Crop" data-te="పంట">Crop</label><input value="Tomato">
+<label data-en="Quantity" data-te="పరిమాణం">Quantity</label><input placeholder="e.g. 500 kg" data-ph-en="e.g. 500 kg" data-ph-te="ఉదా: 500 కిలోలు">
+<label data-en="Expected Price" data-te="అంచనా ధర">Expected Price</label><input placeholder="₹ / kg" data-ph-en="₹ / kg" data-ph-te="₹ / కిలో">
+<label data-en="Location" data-te="ప్రాంతం">Location</label><input placeholder="Village / District" data-ph-en="Village / District" data-ph-te="గ్రామం / జిల్లా">
+<button onclick="demoAlert('listing')" data-en="Publish Listing" data-te="పంట వివరాలను ప్రచురించండి">Publish Listing</button>
+<button class="back" onclick="show('home')" data-en="← Back" data-te="← వెనుకకు">← Back</button>
+</section>
+
+<section id="buyers" class="screen">
+<h3 data-en="🤝 Buyers / FPOs" data-te="🤝 కొనుగోలుదారులు / FPOలు">🤝 Buyers / FPOs</h3>
+<div class="card"><b data-en="Buyer A" data-te="కొనుగోలుదారు A">Buyer A</b><br><span data-en="Tomato • 300 kg • ₹30/kg" data-te="టమాటా • 300 కిలోలు • ₹30/కిలో">Tomato • 300 kg • ₹30/kg</span><br><button onclick="demoAlert('contact')" data-en="Contact" data-te="సంప్రదించండి">Contact</button></div>
+<div class="card"><b data-en="Local FPO" data-te="స్థానిక FPO">Local FPO</b><br><span data-en="Tomato • 500 kg • ₹31/kg" data-te="టమాటా • 500 కిలోలు • ₹31/కిలో">Tomato • 500 kg • ₹31/kg</span><br><button onclick="demoAlert('contact')" data-en="Contact" data-te="సంప్రదించండి">Contact</button></div>
+<button class="back" onclick="show('home')" data-en="← Back" data-te="← వెనుకకు">← Back</button>
+</section>
+
+<section id="storage" class="screen">
+<h3 data-en="🏪 Cold Storage" data-te="🏪 కోల్డ్ స్టోరేజ్">🏪 Cold Storage</h3>
+<div class="card"><b data-en="ABC Cold Storage" data-te="ABC కోల్డ్ స్టోరేజ్">ABC Cold Storage</b><br><span data-en="8 km away<br>Capacity: 10 tons" data-te="8 కి.మీ దూరంలో<br>సామర్థ్యం: 10 టన్నులు">8 km away<br>Capacity: 10 tons</span><br><button onclick="demoAlert('storage')" data-en="Contact" data-te="సంప్రదించండి">Contact</button></div>
+<div class="card"><b data-en="XYZ Cold Storage" data-te="XYZ కోల్డ్ స్టోరేజ్">XYZ Cold Storage</b><br><span data-en="15 km away<br>Capacity: 20 tons" data-te="15 కి.మీ దూరంలో<br>సామర్థ్యం: 20 టన్నులు">15 km away<br>Capacity: 20 tons</span><br><button onclick="demoAlert('storage')" data-en="Contact" data-te="సంప్రదించండి">Contact</button></div>
+<button class="back" onclick="show('home')" data-en="← Back" data-te="← వెనుకకు">← Back</button>
+</section>
+
+<section id="logistics" class="screen">
+<h3 data-en="🚚 Logistics" data-te="🚚 రవాణా">🚚 Logistics</h3>
+<div class="card"><b data-en="Mini Truck" data-te="మినీ ట్రక్">Mini Truck</b><br><span data-en="Capacity: 1 ton<br>Estimated cost: ₹2,000" data-te="సామర్థ్యం: 1 టన్ను<br>అంచనా ఖర్చు: ₹2,000">Capacity: 1 ton<br>Estimated cost: ₹2,000</span><br><button onclick="demoAlert('transport')" data-en="Request" data-te="అభ్యర్థించండి">Request</button></div>
+<div class="card"><b data-en="Pickup Van" data-te="పికప్ వాన్">Pickup Van</b><br><span data-en="Capacity: 500 kg<br>Estimated cost: ₹1,200" data-te="సామర్థ్యం: 500 కిలోలు<br>అంచనా ఖర్చు: ₹1,200">Capacity: 500 kg<br>Estimated cost: ₹1,200</span><br><button onclick="demoAlert('transport')" data-en="Request" data-te="అభ్యర్థించండి">Request</button></div>
+<button class="back" onclick="show('home')" data-en="← Back" data-te="← వెనుకకు">← Back</button>
+</section>
+
+<nav>
+<button onclick="show('home')">🏠 <span data-en="Home" data-te="హోమ్">Home</span></button>
+<button onclick="show('crop')">🌿 <span data-en="Crop" data-te="పంట">Crop</span></button>
+<button onclick="show('market')">💰 <span data-en="Prices" data-te="ధరలు">Prices</span></button>
+<button onclick="show('sell')">📦 <span data-en="Sell" data-te="అమ్మకం">Sell</span></button>
+</nav>
+</div>
+
+<script>
+let currentLang = localStorage.getItem("smartCropLang") || "en";
+
+function setLanguage(lang){
+    currentLang = lang;
+    localStorage.setItem("smartCropLang", lang);
+    applyLanguage();
+}
+
+function toggleLang(){
+    setLanguage(currentLang === "en" ? "te" : "en");
+}
+
+function applyLanguage(){
+    document.documentElement.lang = currentLang === "te" ? "te" : "en";
+
+    document.querySelectorAll("[data-en]").forEach(el => {
+        el.textContent = el.getAttribute(currentLang === "te" ? "data-te" : "data-en");
+    });
+
+    document.querySelectorAll("[data-ph-en]").forEach(el => {
+        el.placeholder = el.getAttribute(currentLang === "te" ? "data-ph-te" : "data-ph-en");
+    });
+
+    document.getElementById("appTitle").textContent =
+        currentLang === "te" ? "🌱 స్మార్ట్ క్రాప్" : "🌱 Smart Crop";
+
+    document.getElementById("appSubtitle").textContent =
+        currentLang === "te" ? "పంట సంరక్షణ & నేరుగా మార్కెట్ యాక్సెస్" :
+        "Crop Care & Direct Market Access";
+
+    document.getElementById("langBtn").textContent =
+        currentLang === "te" ? "English" : "తెలుగు";
+
+    document.getElementById("loginLang").value = currentLang;
+}
+
+function show(id){
+    document.querySelectorAll(".screen").forEach(x => x.classList.remove("active"));
+    document.getElementById(id).classList.add("active");
+    window.scrollTo(0,0);
+    applyLanguage();
+}
+
+function demoAlert(type){
+    const te = currentLang === "te";
+    const messages = {
+        listing: te ? "మీ పంట వివరాలు విజయవంతంగా ప్రచురించబడ్డాయి! (డెమో)" : "Produce listing created successfully! (Demo)",
+        contact: te ? "సంప్రదింపు ఎంపిక తెరవబడింది. (డెమో)" : "Contact option opened. (Demo)",
+        storage: te ? "కోల్డ్ స్టోరేజ్ సంప్రదింపు తెరవబడింది. (డెమో)" : "Storage contact opened. (Demo)",
+        transport: te ? "రవాణా అభ్యర్థన పంపబడింది! (డెమో)" : "Transport request sent! (Demo)"
+    };
+    alert(messages[type]);
+}
+
+applyLanguage();
+</script>
+</body>
+</html>
